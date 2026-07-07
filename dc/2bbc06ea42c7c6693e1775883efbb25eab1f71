@@ -1,0 +1,29 @@
+README_cn.md
+  s_783d078b883ed4::t_630b9f43cee7e9 39
+  s_783d078b883ed4::t_eeadbdef4e363d 37-38,40-41
+  s_783d078b883ed4::t_22aa079b94c2d2 106,180,191,208
+  s_783d078b883ed4::t_d232502ebdaa9a 55-56
+  s_783d078b883ed4::t_e8c910c27e3a5b 125
+README.md
+  s_783d078b883ed4::t_246851290fcba1 125
+  s_783d078b883ed4::t_bcfe3cac613334 39
+  s_783d078b883ed4::t_df6606b5b93275 55-56
+  s_783d078b883ed4::t_9bf975b51e73d7 37-38,40-41
+  s_783d078b883ed4::t_8b087446906a82 106,180,191,208
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "dc2bbc06ea42c7c6693e1775883efbb25eab1f71",
+  "prompts": {},
+  "sessions": {
+    "s_783d078b883ed4": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "e8328406-fc3d-48b5-ab13-55a931c1ec5e",
+        "model": "custom:DSV4-Flash-0"
+      },
+      "human_author": "高国兴 <nanyin@uxin.com>"
+    }
+  }
+}
