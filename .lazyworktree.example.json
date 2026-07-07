@@ -1,0 +1,33 @@
+{
+  "language": "auto",
+  "gui": {
+    "showBottomLine": true
+  },
+  "symlinks": {
+    "names": [".claude", ".agents", ".factory", "CLAUDE.md", "AGENTS.md"]
+  },
+  "baseBranch": {
+    "default": "auto",
+    "projects": {}
+  },
+  "keybindings": {
+    "universal": {
+      "help": "?",
+      "back": "Esc",
+      "quit": "q"
+    },
+    "create": {
+      "confirm": "Enter"
+    },
+    "dashboard": {
+      "moveDown": "j",
+      "moveUp": "k",
+      "filter": "/",
+      "newWorktree": "n",
+      "cleanupGroup": "c",
+      "prune": "p",
+      "refresh": "r",
+      "repair": "s"
+    }
+  }
+}
