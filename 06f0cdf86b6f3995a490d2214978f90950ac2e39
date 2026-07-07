@@ -1,0 +1,21 @@
+src/__tests__/group-dashboard-view.test.ts
+  s_af0b76e62c184e::t_170b32ad4c439d 1-57
+src/__tests__/worktree-manager.test.ts
+  s_af0b76e62c184e::t_a3d7339bff8f1b 1-145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "06f0cdf86b6f3995a490d2214978f90950ac2e39",
+  "prompts": {},
+  "sessions": {
+    "s_af0b76e62c184e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4030fca4-12ca-4400-9cd8-64b58574ba36",
+        "model": "glm-5.2"
+      },
+      "human_author": "高国兴 <nanyin@uxin.com>"
+    }
+  }
+}
