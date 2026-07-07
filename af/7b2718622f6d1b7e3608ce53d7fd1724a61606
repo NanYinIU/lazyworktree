@@ -1,0 +1,22 @@
+README_cn.md
+  s_783d078b883ed4::t_c2a11cc4625af0 3-4
+  s_783d078b883ed4::t_456c9d33252440 1-2,5-243
+README.md
+  s_783d078b883ed4::t_1a1d12d8942c1f 3-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "af7b2718622f6d1b7e3608ce53d7fd1724a61606",
+  "prompts": {},
+  "sessions": {
+    "s_783d078b883ed4": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "e8328406-fc3d-48b5-ab13-55a931c1ec5e",
+        "model": "custom:DSV4-Flash-0"
+      },
+      "human_author": "高国兴 <nanyin@uxin.com>"
+    }
+  }
+}
