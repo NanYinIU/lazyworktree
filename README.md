@@ -34,11 +34,11 @@ lazyworktree assumes your workspace root is a directory whose **direct children*
 
 ```
 ~/Work/uxin/zh/          <- workspace root (run lazyworktree here)
-  api-model/             <- Git repo (contains .git/)
-  base-web-commons/      <- Git repo
-  chat/                  <- Git repo
-  room-server/           <- Git repo
-  service-api/           <- Git repo
+  module1/               <- Git repo (contains .git/)
+  module2/               <- Git repo
+  module3/               <- Git repo
+  module4/               <- Git repo
+  module5/               <- Git repo
   .agents/               <- shared file (auto-symlinked)
   AGENTS.md              <- shared file (auto-symlinked)
   CLAUDE.md              <- shared file (auto-symlinked)
@@ -52,8 +52,8 @@ When you create a worktree group for a feature branch, lazyworktree creates a **
 
 ```
 ../zh-feature-foo/       <- worktree group root
-  api-model/             <- worktree for api-model on feature/foo
-  room-server/           <- worktree for room-server on feature/foo
+  module1/               <- worktree for module1 on feature/foo
+  module4/               <- worktree for module4 on feature/foo
   .agents -> ../zh/.agents      <- root symlinks (workspace-level files)
   AGENTS.md -> ../zh/AGENTS.md
 ```
@@ -103,7 +103,7 @@ The Home screen shows two options: **Create** (new worktree group) and **Groups*
 ### CLI shortcut (skip the TUI selection)
 
 ```bash
-lazyworktree --projects api-model,room-server --feature feature/foo
+lazyworktree --projects module1,module4 --feature feature/foo
 ```
 
 This opens directly into the plan review screen with those projects pre-selected.
@@ -122,7 +122,7 @@ This opens directly into the plan review screen with those projects pre-selected
 8. On completion, enter the generated worktree group directory and start developing:
 
 ```bash
-cd ../zh-my-cross-repo-change/api-model
+cd ../zh-my-cross-repo-change/module1
 git status   # already on the correct branch
 ```
 
@@ -177,7 +177,7 @@ Place a `.lazyworktree.json` file in the workspace root. The Settings screen can
 | `gui.showBottomLine` | Show/hide the lazygit-style keybinding hints at the bottom |
 | `symlinks.names` | Files/directories to symlink into every worktree |
 | `baseBranch.default` | `"auto"` (detect `origin/HEAD`) or an explicit ref like `"origin/main"` |
-| `baseBranch.projects` | Per-project base branch overrides, e.g. `{ "room-server": "origin/release/2.0" }` |
+| `baseBranch.projects` | Per-project base branch overrides, e.g. `{ "module4": "origin/release/2.0" }` |
 
 ---
 
@@ -188,7 +188,7 @@ lazyworktree --help
 
 Options:
   --projects <list>      Comma-separated project entries
-                         (e.g. "api-model,room-server" or "api-model,ypzb:bugfix-room")
+                         (e.g. "module1,module4" or "module1,ypzb:bugfix-room")
   --feature <branch>     Default feature branch name
   --language <locale>    UI language: auto, zh, or en
   --hide-bottom-line     Hide the keybinding bottom line
@@ -205,7 +205,7 @@ Options:
 | Uninstall | `npm uninstall -g lazyworktree` |
 | Launch TUI | `lazyworktree` |
 | Launch with English UI | `lazyworktree --language en` |
-| Quick create | `lazyworktree --projects api-model,room-server --feature feature/foo` |
+| Quick create | `lazyworktree --projects module1,module4 --feature feature/foo` |
 
 ---
 
