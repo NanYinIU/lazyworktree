@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { render } from 'ink';
 import { Command } from 'commander';
 import React from 'react';

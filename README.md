@@ -3,21 +3,36 @@
 Terminal UI for creating and maintaining Git worktree groups in a multi-repo
 workspace. The app is built with TypeScript, Ink, and `@inkjs/ui`.
 
-## Usage
+## Installation
 
-From the package directory:
+### Via npm (recommended)
 
 ```bash
-npm run dev
-npm run dev -- --projects api-model,room-server --feature feature/foo
+npm install -g lazyworktree
 ```
 
-From this repository:
+Already globally installed? Update to the latest version:
 
 ```bash
-./lazyworktree.sh
-./lazyworktree.sh --language en
-./lazyworktree.sh --hide-bottom-line
+npm update -g lazyworktree
+```
+
+### From source
+
+```bash
+cd scripts/lazyworktree
+npm install
+npm run build
+npm link
+```
+
+## Usage
+
+```bash
+lazyworktree
+lazyworktree --language en
+lazyworktree --hide-bottom-line
+lazyworktree --projects api-model,room-server --feature feature/foo
 ```
 
 ## Screens
