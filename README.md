@@ -1,5 +1,7 @@
 # lazyworktree
 
+> [**中文文档**](./README_cn.md) | [English](./README.md)
+
 Terminal UI for creating Git worktree groups in a multi-repo workspace.
 
 [![npm version](https://img.shields.io/npm/v/lazyworktree)](https://www.npmjs.com/package/lazyworktree)
