@@ -2,7 +2,7 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import type { GitProject, ProjectSpec, PlanItem } from './types.js';
 import { getWorktreeRoot, getWorktreeProjectPath } from './fs-layout.js';
-import { hasLocalBranch, getRefCommit, isDirty, detectDefaultBranch, findBranchCheckout } from './git.js';
+import { hasLocalBranch, hasRemoteBranch, getRefCommit, isDirty, detectDefaultBranch, findBranchCheckout } from './git.js';
 import { validateBranchName, validateDirectoryName } from './validation.js';
 
 export interface BaseBranchConfig {
@@ -58,7 +58,9 @@ export async function buildPlan(
     const targetExists = fs.existsSync(targetPath);
 
     const branchExists = await hasLocalBranch(project.path, branch);
-    const sourceRef = await resolveBaseRef(project, baseBranch);
+    const remoteRef = `origin/${branch}`;
+    const sourceIsRemoteBranch = !branchExists && await hasRemoteBranch(project.path, branch);
+    const sourceRef = sourceIsRemoteBranch ? remoteRef : await resolveBaseRef(project, baseBranch);
 
     let branchDiverges = false;
     if (branchExists) {
@@ -77,6 +79,7 @@ export async function buildPlan(
       branch,
       targetPath,
       sourceRef,
+      sourceIsRemoteBranch,
       dirty,
       branchExists,
       branchDiverges,

@@ -8,6 +8,7 @@ function item(name: string, fields: Partial<PlanItem>): PlanItem {
     branch: 'feature/foo',
     targetPath: `/tmp/zh-feature/${name}`,
     sourceRef: 'origin/master',
+    sourceIsRemoteBranch: false,
     dirty: false,
     branchExists: false,
     branchDiverges: false,

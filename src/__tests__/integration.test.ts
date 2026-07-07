@@ -47,6 +47,17 @@ async function initProjectWithOrigin(name: string): Promise<GitProject> {
   return { name, path: repoPath };
 }
 
+async function pushRemoteOnlyBranch(project: GitProject, branch: string): Promise<void> {
+  await git(project.path, ['checkout', '-b', branch]);
+  await fs.writeFile(path.join(project.path, 'remote-branch.txt'), branch);
+  await git(project.path, ['add', '.']);
+  await git(project.path, ['commit', '-m', `add ${branch}`]);
+  await git(project.path, ['push', '-u', 'origin', branch]);
+  await git(project.path, ['checkout', 'master']);
+  await git(project.path, ['branch', '-D', branch]);
+  await git(project.path, ['update-ref', '-d', `refs/remotes/origin/${branch}`]);
+}
+
 describe('lazyworktree integration', () => {
   it('creates a real git worktree from origin/master and root symlinks', async () => {
     const project = await initProjectWithOrigin('api-model');
@@ -67,6 +78,20 @@ describe('lazyworktree integration', () => {
     expect(events.some((event) => event.includes('worktree created'))).toBe(true);
     // Symlink names are written to .git/info/exclude so new worktrees stay clean.
     expect(await git(worktreePath, ['status', '--porcelain'])).toBe('');
+  });
+
+  it('creates a tracked local branch from a same-name remote branch', async () => {
+    const project = await initProjectWithOrigin('remote-proj');
+    await pushRemoteOnlyBranch(project, 'feature/remote-existing');
+
+    const plan = await buildPlan([project], 'feature/remote-existing', new Map(), rootDir, 'zh-feature-remote-existing');
+    const result = await executePlan(plan, rootDir, DEFAULT_SYMLINK_NAMES, () => {});
+
+    const worktreePath = path.join(tmpDir, 'zh-feature-remote-existing', 'remote-proj');
+    expect(result.failed).toEqual([]);
+    expect(await fs.pathExists(path.join(worktreePath, 'remote-branch.txt'))).toBe(true);
+    expect(await git(worktreePath, ['branch', '--show-current'])).toBe('feature/remote-existing');
+    expect(await git(worktreePath, ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'])).toBe('origin/feature/remote-existing');
   });
 
   it('appends symlink names to the worktree info/exclude idempotently', async () => {

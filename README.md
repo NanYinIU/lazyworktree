@@ -81,6 +81,8 @@ Supported `language` values are `auto`, `zh`, and `en`.
 ## Behavior
 
 - Worktree group names use the workspace directory name as the prefix.
+- When the requested branch already exists on `origin`, lazyworktree creates a
+  local tracking branch from that remote branch.
 - Base branch defaults to `origin/HEAD`, then `origin/main`, then
   `origin/master`; `.lazyworktree.json` can override it globally or per project.
 - Symlink names are mirrored into the group root and each project worktree when

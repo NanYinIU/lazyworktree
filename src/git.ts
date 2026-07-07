@@ -28,6 +28,14 @@ export async function fetchRef(projectPath: string, ref: string): Promise<GitRes
   return { ok: true };
 }
 
+export async function fetchRemoteBranch(projectPath: string, branch: string): Promise<GitResult<void>> {
+  const result = await runGit(projectPath, ['fetch', 'origin', branch]);
+  if (!result.ok) {
+    return { ok: false, error: result.error };
+  }
+  return { ok: true };
+}
+
 /** Detect the default remote branch using origin/HEAD, origin/main, then origin/master. */
 export async function detectDefaultBranch(projectPath: string): Promise<string> {
   const head = await runGit(projectPath, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD']);
@@ -49,6 +57,19 @@ export async function hasLocalBranch(projectPath: string, branch: string): Promi
   return refExists(projectPath, `refs/heads/${branch}`);
 }
 
+export async function hasRemoteBranch(projectPath: string, branch: string): Promise<boolean> {
+  const remoteRef = `refs/remotes/origin/${branch}`;
+  if (await refExists(projectPath, remoteRef)) {
+    return true;
+  }
+
+  const fetchResult = await fetchRemoteBranch(projectPath, branch);
+  if (!fetchResult.ok) {
+    return false;
+  }
+  return refExists(projectPath, remoteRef);
+}
+
 export async function getRefCommit(projectPath: string, ref: string): Promise<GitResult<string>> {
   return runGit(projectPath, ['rev-parse', ref]);
 }
@@ -67,6 +88,21 @@ export async function addWorktreeFromRef(
 ): Promise<GitResult<void>> {
   const result = await runGit(projectPath, [
     'worktree', 'add', '-b', branch, targetPath, ref,
+  ]);
+  if (!result.ok) {
+    return { ok: false, error: result.error };
+  }
+  return { ok: true };
+}
+
+export async function addWorktreeFromRemoteBranch(
+  projectPath: string,
+  targetPath: string,
+  branch: string,
+  ref: string
+): Promise<GitResult<void>> {
+  const result = await runGit(projectPath, [
+    'worktree', 'add', '--track', '-b', branch, targetPath, ref,
   ]);
   if (!result.ok) {
     return { ok: false, error: result.error };

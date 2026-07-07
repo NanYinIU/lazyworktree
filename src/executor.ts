@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import type { PlanItem, ProgressEvent, SymlinkResult, ExecutionResult } from './types.js';
-import { fetchRef, refExists, addWorktreeFromRef, addWorktreeFromExistingBranch, appendInfoExclude } from './git.js';
+import { fetchRef, refExists, addWorktreeFromRef, addWorktreeFromRemoteBranch, addWorktreeFromExistingBranch, appendInfoExclude } from './git.js';
 import { createSymlinks, createRootSymlinks } from './fs-layout.js';
 
 type ProgressCallback = (event: ProgressEvent) => void;
@@ -77,6 +77,8 @@ export async function executePlan(
     // Create the worktree.
     if (item.branchExists) {
       onProgress({ type: 'project:step', project: name, step: `git worktree add ${item.targetPath} ${item.branch} (reuse existing branch)`, status: 'running', command: `git worktree add ${item.targetPath} ${item.branch}` });
+    } else if (item.sourceIsRemoteBranch) {
+      onProgress({ type: 'project:step', project: name, step: `git worktree add --track -b ${item.branch} ${item.targetPath} ${item.sourceRef}`, status: 'running', command: `git worktree add --track -b ${item.branch} ${item.targetPath} ${item.sourceRef}` });
     } else {
       onProgress({ type: 'project:step', project: name, step: `git worktree add -b ${item.branch} ${item.targetPath} ${item.sourceRef}`, status: 'running', command: `git worktree add -b ${item.branch} ${item.targetPath} ${item.sourceRef}` });
     }
@@ -84,6 +86,8 @@ export async function executePlan(
     let worktreeResult;
     if (item.branchExists) {
       worktreeResult = await addWorktreeFromExistingBranch(item.project.path, item.targetPath, item.branch);
+    } else if (item.sourceIsRemoteBranch) {
+      worktreeResult = await addWorktreeFromRemoteBranch(item.project.path, item.targetPath, item.branch, item.sourceRef);
     } else {
       worktreeResult = await addWorktreeFromRef(item.project.path, item.targetPath, item.branch, item.sourceRef);
     }

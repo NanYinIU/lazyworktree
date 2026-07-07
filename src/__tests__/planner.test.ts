@@ -31,6 +31,21 @@ async function initRepo(name: string): Promise<GitProject> {
   return { name, path: repoPath };
 }
 
+async function attachRemoteWithBranch(project: GitProject, branch: string): Promise<void> {
+  const remotePath = path.join(tmpDir, `${project.name}.git`);
+  await execa('git', ['init', '--bare', remotePath]);
+  await execa('git', ['remote', 'add', 'origin', remotePath], { cwd: project.path });
+  await execa('git', ['push', '-u', 'origin', 'master'], { cwd: project.path });
+  await execa('git', ['checkout', '-b', branch], { cwd: project.path });
+  fs.writeFileSync(path.join(project.path, 'branch.txt'), branch);
+  await execa('git', ['add', '.'], { cwd: project.path });
+  await execa('git', ['commit', '-m', `add ${branch}`], { cwd: project.path });
+  await execa('git', ['push', '-u', 'origin', branch], { cwd: project.path });
+  await execa('git', ['checkout', 'master'], { cwd: project.path });
+  await execa('git', ['branch', '-D', branch], { cwd: project.path });
+  await execa('git', ['update-ref', '-d', `refs/remotes/origin/${branch}`], { cwd: project.path });
+}
+
 describe('parseProjectSpecs', () => {
   it('parses simple project list', () => {
     const specs = parseProjectSpecs('api-model,ypzb,room-portal');
@@ -167,6 +182,16 @@ describe('buildPlan', () => {
     const proj = await initRepo('proj-a');
     const plan = await buildPlan([proj], 'feature/x', new Map(), rootDir, 'zh-x');
     expect(plan[0].sourceRef).toBe('origin/master');
+  });
+
+  it('uses a same-name remote branch before falling back to the base branch', async () => {
+    const proj = await initRepo('proj-a');
+    await attachRemoteWithBranch(proj, 'feature/remote-only');
+
+    const plan = await buildPlan([proj], 'feature/remote-only', new Map(), rootDir, 'zh-remote-only');
+
+    expect(plan[0].branchExists).toBe(false);
+    expect(plan[0].sourceRef).toBe('origin/feature/remote-only');
   });
 
   it('flags conflictPath when the branch is already checked out in another worktree', async () => {

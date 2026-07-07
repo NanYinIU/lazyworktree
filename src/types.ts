@@ -15,6 +15,7 @@ export interface PlanItem {
   branch: string;
   targetPath: string;
   sourceRef: string;
+  sourceIsRemoteBranch: boolean;
   dirty: boolean;
   branchExists: boolean;
   branchDiverges: boolean;
