@@ -19,9 +19,9 @@ async function runGit(
 }
 
 export async function fetchRef(projectPath: string, ref: string): Promise<GitResult<void>> {
-  // ref 形如 origin/main —— fetch 只接受分支名
+  // ref 形如 origin/main —— 用显式 refspec 确保更新远程跟踪引用
   const branch = ref.replace(/^origin\//, '');
-  const result = await runGit(projectPath, ['fetch', 'origin', branch]);
+  const result = await runGit(projectPath, ['fetch', 'origin', `+refs/heads/${branch}:refs/remotes/origin/${branch}`]);
   if (!result.ok) {
     return { ok: false, error: result.error };
   }
@@ -212,6 +212,33 @@ export async function getLastCommitDate(worktreePath: string): Promise<number | 
   if (!result.ok) return null;
   const ts = parseInt(result.value!, 10);
   return isNaN(ts) ? null : ts;
+}
+
+/**
+ * Check if a local branch is behind its remote tracking branch.
+ * Uses local cache only: `git rev-list --count branch..origin/branch`.
+ * Returns false if the remote ref doesn't exist.
+ */
+export async function isBehindRemote(projectPath: string, branch: string): Promise<boolean> {
+  const ref = `origin/${branch}`;
+  const exists = await refExists(projectPath, ref);
+  if (!exists) return false;
+  const result = await runGit(projectPath, ['rev-list', '--count', `${branch}..${ref}`]);
+  if (!result.ok) return false;
+  const count = parseInt(result.value!, 10);
+  return !isNaN(count) && count > 0;
+}
+
+export async function fetchProject(projectPath: string): Promise<GitResult<void>> {
+  const result = await runGit(projectPath, ['fetch', 'origin']);
+  if (!result.ok) {
+    return { ok: false, error: result.error };
+  }
+  return { ok: true };
+}
+
+export async function pullBranch(worktreePath: string, branch: string): Promise<GitResult<string>> {
+  return runGit(worktreePath, ['pull', 'origin', branch]);
 }
 
 /**

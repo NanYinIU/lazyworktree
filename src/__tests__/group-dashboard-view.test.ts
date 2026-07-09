@@ -11,6 +11,7 @@ function group(name: string, fields: Partial<WorktreeGroup> = {}): WorktreeGroup
     hasDirty: false,
     hasUnmerged: false,
     hasMissing: false,
+    hasBehindRemote: false,
     recommendedForCleanup: false,
     ...fields,
   };
@@ -21,10 +22,11 @@ describe('group dashboard view model', () => {
     const summary = summarizeGroups([
       group('dirty', { hasDirty: true }),
       group('unmerged', { hasUnmerged: true }),
+      group('behind', { hasBehindRemote: true }),
       group('stale', { recommendedForCleanup: true }),
     ]);
 
-    expect(summary).toEqual({ dirty: 1, unmerged: 1, stale: 1 });
+    expect(summary).toEqual({ dirty: 1, unmerged: 1, behind: 1, stale: 1 });
   });
 
   it('filters by group name, path, project name, and branch', () => {
@@ -40,6 +42,7 @@ describe('group dashboard view model', () => {
             dirty: false,
             missing: false,
             mergedToBase: false,
+            behindRemote: false,
             lastCommitDate: null,
           },
         ],

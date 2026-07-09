@@ -13,12 +13,15 @@ import type {
   CleanupResult,
   CleanupItemResult,
   RepairResult,
+  FetchResult,
+  PullResult,
 } from './types.js';
 import { scanGitProjects, getWorktreeRoot, featureToDirectoryName, getRootName } from './fs-layout.js';
+import { resolveWorkspaceRoot } from './workspace-root.js';
 import { buildPlan } from './planner.js';
 import { executePlan } from './executor.js';
 import { discoverWorktreeGroups } from './worktree-manager.js';
-import { executeSafePrune, executeCleanup, executeForceRetry, executeBranchDeletion, executeRepair } from './manage-executor.js';
+import { executeSafePrune, executeCleanup, executeForceRetry, executeBranchDeletion, executeRepair, executeFetchGroup, executePullGroup } from './manage-executor.js';
 import type { ActivityTask } from './activity.js';
 import { t } from './i18n.js';
 import { Home } from './components/Home.js';
@@ -124,12 +127,14 @@ export function App({ prefilledProjects, prefilledFeature, startMode, config }: 
   const [deletedBranches, setDeletedBranches] = useState<{ projectName: string; branch: string }[]>([]);
   const [failedBranches, setFailedBranches] = useState<{ projectName: string; branch: string; reason: string }[]>([]);
   const [repairResult, setRepairResult] = useState<RepairResult | null>(null);
+  const [fetchResult, setFetchResult] = useState<FetchResult | null>(null);
+  const [pullResult, setPullResult] = useState<PullResult | null>(null);
 
   // ref 让 force/branch 任务闭包读到最新 cleanupResult（避免闭包陈旧）
   const cleanupResultRef = useRef<CleanupResult | null>(null);
   useEffect(() => { cleanupResultRef.current = cleanupResult; }, [cleanupResult]);
 
-  const rootDir = process.cwd();
+  const rootDir = resolveWorkspaceRoot(process.cwd());
   const rootName = getRootName(rootDir);
   const parentDir = path.dirname(rootDir);
   const worktreeRoot = targetDirName ? getWorktreeRoot(parentDir, targetDirName) : '';
@@ -166,6 +171,8 @@ export function App({ prefilledProjects, prefilledFeature, startMode, config }: 
     setDeletedBranches([]);
     setFailedBranches([]);
     setRepairResult(null);
+    setFetchResult(null);
+    setPullResult(null);
     setActivityTask(null);
   }, []);
 
@@ -342,6 +349,35 @@ export function App({ prefilledProjects, prefilledFeature, startMode, config }: 
     startActivity(task, 'repair');
   }, [rootDir, groups, symlinkNames, startActivity]);
 
+  const startFetchActivity = useCallback((groupRoot: string) => {
+    const group = groups.find((g) => g.rootPath === groupRoot);
+    const name = group?.name ?? '';
+    const task: ActivityTask = {
+      title: `${t('fetchExec')}: ${name}`,
+      run: async (onProgress) => {
+        const r = await executeFetchGroup(groups, groupRoot, onProgress);
+        setFetchResult(r);
+      },
+    };
+    setFetchResult(null);
+    startActivity(task, 'fetch');
+  }, [groups, startActivity]);
+
+  const startPullActivity = useCallback((groupRoot: string) => {
+    const group = groups.find((g) => g.rootPath === groupRoot);
+    const name = group?.name ?? '';
+    const count = group?.items.filter((i) => !i.missing && i.branch).length ?? 0;
+    const task: ActivityTask = {
+      title: `${t('pullExec')}: ${name}`,
+      run: async (onProgress) => {
+        const r = await executePullGroup(groups, groupRoot, onProgress);
+        setPullResult(r);
+      },
+    };
+    setPullResult(null);
+    startActivity(task, 'pull');
+  }, [groups, startActivity]);
+
   if (loading && (screen === 'projectPicker' || screen === 'groupList')) {
     return <Box><Text>{t('scanning')}</Text></Box>;
   }
@@ -413,6 +449,8 @@ export function App({ prefilledProjects, prefilledFeature, startMode, config }: 
             pruneResult={pruneResult}
             cleanupResult={cleanupResult}
             repairResult={repairResult}
+            fetchResult={fetchResult}
+            pullResult={pullResult}
             deletedBranches={deletedBranches}
             failedBranches={failedBranches}
             worktreeRoot={worktreeRoot}
@@ -428,12 +466,15 @@ export function App({ prefilledProjects, prefilledFeature, startMode, config }: 
         <GroupList
           groups={groups}
           config={config}
+          rootName={rootName}
           onBack={backToHome}
           onCreate={startCreateFlow}
           onCleanupGroup={cleanupSingleGroup}
           onPrune={startPruneActivity}
           onRefresh={refreshGroups}
           onRepair={startRepairActivity}
+          onFetch={startFetchActivity}
+          onPull={startPullActivity}
         />
       )}
 

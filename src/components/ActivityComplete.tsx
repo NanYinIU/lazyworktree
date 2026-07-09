@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box, Text, useInput } from 'ink';
-import type { ExecutionResult, PruneResult, CleanupResult, RepairResult } from '../types.js';
+import type { ExecutionResult, PruneResult, CleanupResult, RepairResult, FetchResult, PullResult } from '../types.js';
 import { ConfirmDialog } from './ui/ConfirmDialog.js';
 import { t } from '../i18n.js';
 
-export type ActivityPhase = 'create' | 'prune' | 'cleanup' | 'force' | 'branch' | 'repair';
+export type ActivityPhase = 'create' | 'prune' | 'cleanup' | 'force' | 'branch' | 'repair' | 'fetch' | 'pull';
 
 interface Props {
   phase: ActivityPhase;
@@ -12,6 +12,8 @@ interface Props {
   pruneResult: PruneResult | null;
   cleanupResult: CleanupResult | null;
   repairResult: RepairResult | null;
+  fetchResult: FetchResult | null;
+  pullResult: PullResult | null;
   deletedBranches: { projectName: string; branch: string }[];
   failedBranches: { projectName: string; branch: string; reason: string }[];
   worktreeRoot: string;
@@ -32,7 +34,7 @@ function cleanupNext(cr: CleanupResult | null): 'force' | 'branch' | 'done' {
 
 /** Completion view for activity results and follow-up confirmations. */
 export function ActivityComplete(props: Props): React.ReactElement {
-  const { phase, result, pruneResult, cleanupResult, repairResult, deletedBranches, failedBranches, worktreeRoot } = props;
+  const { phase, result, pruneResult, cleanupResult, repairResult, fetchResult, pullResult, deletedBranches, failedBranches, worktreeRoot } = props;
   const { onStartForce, onStartBranch, onDeclineForce, onDone } = props;
   const next = cleanupNext(cleanupResult);
   const interactive = (phase === 'cleanup' || phase === 'force') && next !== 'done';
@@ -99,6 +101,26 @@ export function ActivityComplete(props: Props): React.ReactElement {
           {repairResult.repairedGroups.length > 0 ? (
             <Text dimColor>{t('repairGroups')}: {repairResult.repairedGroups.join(', ')}</Text>
           ) : null}
+        </>
+      ) : null}
+
+      {phase === 'fetch' && fetchResult ? (
+        <>
+          <Text bold color="green">{t('fetchResults')}</Text>
+          <Text>{t('success')} {fetchResult.fetched.length} · {t('failed')} {fetchResult.failed.length}</Text>
+          {fetchResult.failed.map((f, i) => (
+            <Text key={i} color="red">  {f.project}: {f.reason}</Text>
+          ))}
+        </>
+      ) : null}
+
+      {phase === 'pull' && pullResult ? (
+        <>
+          <Text bold color="green">{t('pullResults')}</Text>
+          <Text>{t('pulledUpdates')} {pullResult.pulled.length} · {t('pullUpToDate')} {pullResult.upToDate.length} · {t('failed')} {pullResult.failed.length}</Text>
+          {pullResult.failed.map((f, i) => (
+            <Text key={i} color="red">  {f.projectName}/{f.branch}: {f.reason}</Text>
+          ))}
         </>
       ) : null}
 

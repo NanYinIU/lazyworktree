@@ -101,6 +101,7 @@ describe('computeGroupAgeDays', () => {
         dirty: false,
         missing: false,
         mergedToBase: false,
+        behindRemote: false,
         lastCommitDate: now - 5 * 86400,
       },
       {
@@ -112,6 +113,7 @@ describe('computeGroupAgeDays', () => {
         dirty: false,
         missing: false,
         mergedToBase: false,
+        behindRemote: false,
         lastCommitDate: now - 20 * 86400,
       },
     ];
@@ -130,6 +132,7 @@ describe('computeGroupAgeDays', () => {
         dirty: false,
         missing: true,
         mergedToBase: false,
+        behindRemote: false,
         lastCommitDate: null,
       },
     ];

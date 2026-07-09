@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'fs-extra';
-import type { GitProject, WorktreeGroup, PruneResult, CleanupResult, CleanupItemResult, RepairResult, SymlinkResult, ProgressEvent } from './types.js';
+import type { GitProject, WorktreeGroup, PruneResult, CleanupResult, CleanupItemResult, RepairResult, SymlinkResult, ProgressEvent, FetchResult, PullResult } from './types.js';
 import { scanGitProjects, createSymlinks, createRootSymlinks } from './fs-layout.js';
 import {
   pruneWorktreesDryRun,
@@ -8,6 +8,8 @@ import {
   removeWorktree,
   removeWorktreeForce,
   deleteLocalBranch,
+  fetchRef,
+  pullBranch,
 } from './git.js';
 
 type ProgressCallback = (event: ProgressEvent) => void;
@@ -366,4 +368,91 @@ export async function executeRepair(
   }
 
   return { created, skipped, repairedGroups };
+}
+
+export async function executeFetchGroup(
+  groups: WorktreeGroup[],
+  selectedGroupRoot: string,
+  onProgress: ProgressCallback
+): Promise<FetchResult> {
+  const fetched: string[] = [];
+  const failed: { project: string; reason: string }[] = [];
+
+  const group = groups.find((g) => g.rootPath === selectedGroupRoot);
+  if (!group) return { fetched, failed };
+
+  const groupName = group.name;
+  onProgress({ type: 'project:start', project: groupName });
+
+  for (const item of group.items) {
+    if (item.missing || !item.branch) {
+      onProgress({ type: 'project:step', project: groupName, step: `${item.projectName}: skipped (missing or no branch)`, status: 'skipped' });
+      continue;
+    }
+
+    const ref = `origin/${item.branch}`;
+    onProgress({ type: 'project:step', project: item.projectName, step: `git fetch origin ${item.branch}`, status: 'running', command: `git fetch origin ${item.branch}` });
+
+    const result = await fetchRef(item.projectPath, ref);
+    if (result.ok) {
+      onProgress({ type: 'project:step', project: item.projectName, step: 'fetch done', status: 'done' });
+      fetched.push(`${item.projectName}/${item.branch}`);
+    } else {
+      onProgress({ type: 'project:step', project: item.projectName, step: `fetch failed: ${result.error}`, status: 'failed' });
+      failed.push({ project: `${item.projectName}/${item.branch}`, reason: result.error || 'fetch failed' });
+    }
+  }
+
+  onProgress({ type: 'project:success', project: groupName });
+  return { fetched, failed };
+}
+
+export async function executePullGroup(
+  groups: WorktreeGroup[],
+  selectedGroupRoot: string,
+  onProgress: ProgressCallback
+): Promise<PullResult> {
+  const pulled: { projectName: string; branch: string }[] = [];
+  const upToDate: { projectName: string; branch: string }[] = [];
+  const failed: ({ projectName: string; branch: string } & { reason: string })[] = [];
+
+  const group = groups.find((g) => g.rootPath === selectedGroupRoot);
+  if (!group) return { pulled, upToDate, failed };
+
+  const groupName = group.name;
+  onProgress({ type: 'project:start', project: groupName });
+
+  for (const item of group.items) {
+    if (item.missing || !item.branch) {
+      onProgress({ type: 'project:step', project: groupName, step: `${item.projectName}: skipped (missing or no branch)`, status: 'skipped' });
+      continue;
+    }
+
+    const label = `${item.projectName}/${item.branch}`;
+    onProgress({
+      type: 'project:step',
+      project: groupName,
+      step: `git pull origin ${item.branch} (${item.projectName})`,
+      status: 'running',
+      command: `git -C ${item.worktreePath} pull origin ${item.branch}`,
+    });
+
+    const result = await pullBranch(item.worktreePath, item.branch);
+    if (result.ok) {
+      const output = result.value || '';
+      if (output.includes('Already up to date')) {
+        onProgress({ type: 'project:step', project: groupName, step: `${label}: already up to date`, status: 'done' });
+        upToDate.push({ projectName: item.projectName, branch: item.branch });
+      } else {
+        onProgress({ type: 'project:step', project: groupName, step: `${label}: pulled successfully`, status: 'done' });
+        pulled.push({ projectName: item.projectName, branch: item.branch });
+      }
+    } else {
+      onProgress({ type: 'project:step', project: groupName, step: `${label}: pull failed: ${result.error}`, status: 'failed' });
+      failed.push({ projectName: item.projectName, branch: item.branch, reason: result.error || 'pull failed' });
+    }
+  }
+
+  onProgress({ type: 'project:success', project: groupName });
+  return { pulled, upToDate, failed };
 }

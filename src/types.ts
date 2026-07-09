@@ -83,6 +83,7 @@ export interface WorktreeItem {
   dirty: boolean;
   missing: boolean;
   mergedToBase: boolean;
+  behindRemote: boolean;
   lastCommitDate: number | null;
 }
 
@@ -94,6 +95,7 @@ export interface WorktreeGroup {
   hasDirty: boolean;
   hasUnmerged: boolean;
   hasMissing: boolean;
+  hasBehindRemote: boolean;
   recommendedForCleanup: boolean;
 }
 
@@ -144,4 +146,20 @@ export interface GitResult<T> {
   ok: boolean;
   value?: T;
   error?: string;
+}
+
+export interface FetchResult {
+  fetched: string[];
+  failed: { project: string; reason: string }[];
+}
+
+export interface PullItemResult {
+  projectName: string;
+  branch: string;
+}
+
+export interface PullResult {
+  pulled: PullItemResult[];
+  upToDate: PullItemResult[];
+  failed: (PullItemResult & { reason: string })[];
 }

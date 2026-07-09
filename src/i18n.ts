@@ -104,15 +104,17 @@ const strings: StringMap = {
 
   // Group List
   groupListTitle: { zh: 'Worktree 分组列表', en: 'Worktree Groups' },
-  noGroups: { zh: '未找到 zh-* worktree 分组', en: 'No zh-* worktree groups found.' },
+  noGroups: { zh: '未找到 {rootName}-* worktree 分组', en: 'No {rootName}-* worktree groups found.' },
   daysOld: { zh: '天', en: 'd old' },
   projects: { zh: '个项目', en: 'project(s)' },
   pressEscBack: { zh: '按 Esc 返回', en: 'Press Esc to go back' },
   badgeDirty: { zh: '脏', en: 'dirty' },
   badgeClean: { zh: '干净', en: 'clean' },
   badgeUnmerged: { zh: '未合并', en: 'unmerged' },
+  badgeBehind: { zh: '需更新', en: 'behind' },
   badgeMissing: { zh: '缺失', en: 'missing' },
   badgeStale: { zh: '过期', en: 'stale' },
+  badgeUpToDate: { zh: '已最新', en: 'up to date' },
   merged: { zh: '已合并', en: 'merged' },
 
   // Safe Prune
@@ -171,6 +173,24 @@ const strings: StringMap = {
   forceRetryExec: { zh: '强制删除执行中', en: 'Force Remove Execution' },
   forceRetrying: { zh: '强制删除中...', en: 'Force removing...' },
 
+  // Fetch
+  fetchExec: { zh: 'fetch 执行中', en: 'Fetch Execution' },
+  fetching: { zh: 'fetch 中...', en: 'Fetching...' },
+  fetchResults: { zh: 'fetch 结果', en: 'Fetch Results' },
+  nothingToFetch: { zh: '无需 fetch', en: 'Nothing to fetch.' },
+  fetchSkipped: { zh: '跳过的项目', en: 'Skipped projects' },
+
+  // Pull
+  pullExec: { zh: 'pull 执行中', en: 'Pull Execution' },
+  pulling: { zh: 'pull 中...', en: 'Pulling...' },
+  pullResults: { zh: 'pull 结果', en: 'Pull Results' },
+  pullConfirmTitle: { zh: '确认 pull', en: 'Confirm Pull' },
+  pullConfirmMsg: { zh: '将对分组 {name} 的 {count} 个 worktree 执行 git pull', en: 'This will git pull for {count} worktrees in group {name}' },
+  pullConflict: { zh: '合并冲突', en: 'merge conflict' },
+  pulledUpdates: { zh: '已更新', en: 'Updated' },
+  pullUpToDate: { zh: '已最新', en: 'Up to date' },
+  nothingToPull: { zh: '无需 pull', en: 'Nothing to pull.' },
+
   // Common
   scanning: { zh: '扫描中...', en: 'Scanning...' },
   buildingPlan: { zh: '构建计划中...', en: 'Building plan...' },
@@ -216,6 +236,8 @@ const strings: StringMap = {
   inlinePruneTitle: { zh: '确认安全清理', en: 'Confirm Safe Prune' },
   inlinePruneMessage: { zh: '将清除缺失 worktree 路径的 Git 元数据，不删除真实目录。', en: 'This will clean Git metadata for missing worktree paths. No real directories will be deleted.' },
   keyRepair: { zh: '修复软链', en: 'repair symlinks' },
+  keyFetch: { zh: 'fetch 远程', en: 'fetch remote' },
+  keyPull: { zh: 'pull 更新', en: 'pull updates' },
   keyQuit: { zh: '退出', en: 'quit' },
   settingsTitle: { zh: '设置', en: 'Settings' },
   settingsLanguage: { zh: '语言', en: 'language' },
@@ -255,8 +277,14 @@ const strings: StringMap = {
 
 export type I18nKey = keyof typeof strings;
 
-export function t(key: I18nKey): string {
+export function t(key: I18nKey, params?: Record<string, string>): string {
   const entry = strings[key];
   if (!entry) return key;
-  return entry[activeLocale];
+  let result = entry[activeLocale];
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      result = result.replaceAll(`{${k}}`, v);
+    }
+  }
+  return result;
 }

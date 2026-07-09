@@ -25,6 +25,8 @@ export interface KeybindingConfig {
     prune: string;
     refresh: string;
     repair: string;
+    fetch: string;
+    pull: string;
   };
 }
 
@@ -81,6 +83,8 @@ export const DEFAULT_CONFIG: AppConfig = {
       prune: 'p',
       refresh: 'r',
       repair: 's',
+      fetch: 'f',
+      pull: 'u',
     },
   },
 };
@@ -186,6 +190,8 @@ function normalizeKeybindings(config: KeybindingConfig, fallback: KeybindingConf
       prune: nonEmpty(config.dashboard.prune, fallback.dashboard.prune),
       refresh: nonEmpty(config.dashboard.refresh, fallback.dashboard.refresh),
       repair: nonEmpty(config.dashboard.repair, fallback.dashboard.repair),
+      fetch: nonEmpty(config.dashboard.fetch, fallback.dashboard.fetch),
+      pull: nonEmpty(config.dashboard.pull, fallback.dashboard.pull),
     },
   };
 }

@@ -13,12 +13,15 @@ import { worstHealth, GROUP_HEALTH } from '../ui/status.js';
 interface Props {
   groups: WorktreeGroup[];
   config: AppConfig;
+  rootName: string;
   onBack: () => void;
   onCreate: () => void;
   onCleanupGroup: (groupRoot: string) => void;
   onPrune: () => void;
   onRefresh: () => void;
   onRepair: (groupRoot: string) => void;
+  onFetch: (groupRoot: string) => void;
+  onPull: (groupRoot: string) => void;
 }
 
 const NAME_W = 28;
@@ -28,17 +31,18 @@ const AGE_W = 8;
 function itemLabels(item: WorktreeItem): { text: string; color: string }[] {
   const out: { text: string; color: string }[] = [];
   if (item.dirty) out.push({ text: t('badgeDirty'), color: GROUP_HEALTH.dirty.color });
+  if (item.behindRemote) out.push({ text: t('badgeBehind'), color: GROUP_HEALTH.behind.color });
   if (item.missing) out.push({ text: t('badgeMissing'), color: GROUP_HEALTH.missing.color });
   if (item.mergedToBase) out.push({ text: t('merged'), color: 'gray' });
   return out;
 }
 
-export function GroupList({ groups, config, onBack, onCreate, onCleanupGroup, onPrune, onRefresh, onRepair }: Props): React.ReactElement {
+export function GroupList({ groups, config, rootName, onBack, onCreate, onCleanupGroup, onPrune, onRefresh, onRepair, onFetch, onPull }: Props): React.ReactElement {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [filterMode, setFilterMode] = useState(false);
   const [draftFilter, setDraftFilter] = useState('');
   const [appliedFilter, setAppliedFilter] = useState('');
-  const [pendingAction, setPendingAction] = useState<'cleanup' | 'prune' | 'repair' | null>(null);
+  const [pendingAction, setPendingAction] = useState<'cleanup' | 'prune' | 'repair' | 'fetch' | 'pull' | null>(null);
   const visibleGroups = useMemo(() => filterGroups(groups, appliedFilter), [groups, appliedFilter]);
   const selectedGroup = visibleGroups[selectedIndex] ?? null;
   const summary = useMemo(() => summarizeGroups(groups), [groups]);
@@ -59,15 +63,17 @@ export function GroupList({ groups, config, onBack, onCreate, onCleanupGroup, on
     if (isKey(input, config.keybindings.dashboard.refresh)) onRefresh();
     if (isKey(input, config.keybindings.dashboard.cleanupGroup) && selectedGroup) setPendingAction('cleanup');
     if (isKey(input, config.keybindings.dashboard.repair) && selectedGroup) setPendingAction('repair');
+    if (isKey(input, config.keybindings.dashboard.fetch) && selectedGroup) setPendingAction('fetch');
+    if (isKey(input, config.keybindings.dashboard.pull) && selectedGroup) setPendingAction('pull');
   });
 
   if (groups.length === 0) {
     return (
       <Box flexDirection="column">
         <Text bold>{t('dashboardTitle')}</Text>
-        <Text dimColor>{t('noGroups')}</Text>
+        <Text dimColor>{t('noGroups', { rootName })}</Text>
         <Text dimColor>
-          {config.keybindings.dashboard.newWorktree} {t('keyNewWorktree')}  {config.keybindings.dashboard.prune} {t('keyPrune')}  {config.keybindings.dashboard.refresh} {t('keyRefresh')}
+          {config.keybindings.dashboard.newWorktree} {t('keyNewWorktree')}  {config.keybindings.dashboard.prune} {t('keyPrune')}  {config.keybindings.dashboard.fetch} {t('keyFetch')}  {config.keybindings.dashboard.refresh} {t('keyRefresh')}
         </Text>
         <Text dimColor>{t('pressEscBack')}</Text>
       </Box>
@@ -81,6 +87,7 @@ export function GroupList({ groups, config, onBack, onCreate, onCleanupGroup, on
       <Box flexDirection="row" gap={3}>
         <Text color={GROUP_HEALTH.dirty.color}>{t('badgeDirty')}: {summary.dirty}</Text>
         <Text color={GROUP_HEALTH.unmerged.color}>{t('badgeUnmerged')}: {summary.unmerged}</Text>
+        <Text color={GROUP_HEALTH.behind.color}>{t('badgeBehind')}: {summary.behind}</Text>
         <Text color={GROUP_HEALTH.stale.color}>{t('badgeStale')}: {summary.stale}</Text>
         {appliedFilter && <Text color="cyan">{t('dashboardFilter')}: {appliedFilter}</Text>}
       </Box>
@@ -167,6 +174,23 @@ export function GroupList({ groups, config, onBack, onCreate, onCleanupGroup, on
           title={t('repairTitle')}
           message={`${selectedGroup.name}: ${selectedGroup.items.length}${t('projects')}`}
           onConfirm={() => { setPendingAction(null); onRepair(selectedGroup.rootPath); }}
+          onCancel={() => setPendingAction(null)}
+        />
+      )}
+      {pendingAction === 'fetch' && selectedGroup && (
+        <ConfirmDialog
+          title={t('fetchExec')}
+          message={`${selectedGroup.name}: ${t('fetchExec')}`}
+          onConfirm={() => { setPendingAction(null); onFetch(selectedGroup.rootPath); }}
+          onCancel={() => setPendingAction(null)}
+        />
+      )}
+      {pendingAction === 'pull' && selectedGroup && (
+        <ConfirmDialog
+          title={t('pullConfirmTitle')}
+          message={t('pullConfirmMsg', { name: selectedGroup.name, count: String(selectedGroup.items.length) })}
+          danger
+          onConfirm={() => { setPendingAction(null); onPull(selectedGroup.rootPath); }}
           onCancel={() => setPendingAction(null)}
         />
       )}

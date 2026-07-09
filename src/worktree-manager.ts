@@ -2,7 +2,7 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import type { GitProject, WorktreeGroup, WorktreeItem } from './types.js';
 import { scanGitProjects, getRootName } from './fs-layout.js';
-import { listWorktrees, isDirty, isBranchMergedInto, detectDefaultBranch, getLastCommitDate } from './git.js';
+import { listWorktrees, isDirty, isBranchMergedInto, detectDefaultBranch, getLastCommitDate, isBehindRemote } from './git.js';
 
 export const STALE_DAYS = 14;
 
@@ -77,6 +77,7 @@ export async function discoverWorktreeGroups(
       const dirty = await isDirty(wt.path);
       const missing = !fs.existsSync(wt.path);
       const merged = wt.branch ? await isBranchMergedInto(project.path, wt.branch, baseRef) : false;
+      const behindRemote = wt.branch ? await isBehindRemote(project.path, wt.branch) : false;
       const lastCommitDate = await getLastCommitDate(wt.path);
 
       const item: WorktreeItem = {
@@ -88,6 +89,7 @@ export async function discoverWorktreeGroups(
         dirty,
         missing,
         mergedToBase: merged,
+        behindRemote,
         lastCommitDate,
       };
 
@@ -106,6 +108,7 @@ export async function discoverWorktreeGroups(
     const hasDirty = items.some((i) => i.dirty);
     const hasUnmerged = items.some((i) => !i.mergedToBase && i.branch);
     const hasMissing = items.some((i) => i.missing);
+    const hasBehindRemote = items.some((i) => i.behindRemote);
     const recommendedForCleanup = ageDays >= STALE_DAYS && !hasDirty && !hasUnmerged;
 
     groups.push({
@@ -116,6 +119,7 @@ export async function discoverWorktreeGroups(
       hasDirty,
       hasUnmerged,
       hasMissing,
+      hasBehindRemote,
       recommendedForCleanup,
     });
   }

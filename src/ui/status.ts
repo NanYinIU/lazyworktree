@@ -3,7 +3,7 @@ import { GLYPHS } from './glyphs.js';
 import type { WorktreeGroup } from '../types.js';
 
 /** Worktree group health values rendered as a dot, color, and label. */
-export type GroupHealth = 'clean' | 'dirty' | 'unmerged' | 'missing' | 'stale';
+export type GroupHealth = 'clean' | 'dirty' | 'unmerged' | 'behind' | 'missing' | 'stale';
 
 export interface GroupHealthMeta {
   /** Dot glyph shown before the text label. */
@@ -16,6 +16,7 @@ export const GROUP_HEALTH: Record<GroupHealth, GroupHealthMeta> = {
   clean: { dot: GLYPHS.dot, color: 'green', labelKey: 'badgeClean' },
   dirty: { dot: GLYPHS.dot, color: 'yellow', labelKey: 'badgeDirty' },
   unmerged: { dot: GLYPHS.dot, color: 'red', labelKey: 'badgeUnmerged' },
+  behind: { dot: GLYPHS.dot, color: 'blue', labelKey: 'badgeBehind' },
   missing: { dot: GLYPHS.dot, color: 'gray', labelKey: 'badgeMissing' },
   stale: { dot: GLYPHS.dot, color: 'green', labelKey: 'badgeStale' },
 };
@@ -24,6 +25,7 @@ export const GROUP_HEALTH: Record<GroupHealth, GroupHealthMeta> = {
 export function worstHealth(g: WorktreeGroup): GroupHealth {
   if (g.hasUnmerged) return 'unmerged';
   if (g.hasDirty) return 'dirty';
+  if (g.hasBehindRemote) return 'behind';
   if (g.hasMissing) return 'missing';
   if (g.recommendedForCleanup) return 'stale';
   return 'clean';
@@ -34,6 +36,7 @@ export function groupHealths(g: WorktreeGroup): GroupHealth[] {
   const out: GroupHealth[] = [];
   if (g.hasUnmerged) out.push('unmerged');
   if (g.hasDirty) out.push('dirty');
+  if (g.hasBehindRemote) out.push('behind');
   if (g.hasMissing) out.push('missing');
   if (g.recommendedForCleanup) out.push('stale');
   return out;

@@ -11,6 +11,7 @@ function makeGroup(over: Partial<WorktreeGroup>): WorktreeGroup {
     hasDirty: false,
     hasUnmerged: false,
     hasMissing: false,
+    hasBehindRemote: false,
     recommendedForCleanup: false,
     ...over,
   };
@@ -35,9 +36,10 @@ describe('status vocabulary', () => {
     }
   });
 
-  it('worstHealth ranks unmerged > dirty > missing > stale > clean', () => {
+  it('worstHealth ranks unmerged > dirty > behind > missing > stale > clean', () => {
     expect(worstHealth(makeGroup({ hasUnmerged: true, hasDirty: true }))).toBe('unmerged');
-    expect(worstHealth(makeGroup({ hasDirty: true, recommendedForCleanup: true }))).toBe('dirty');
+    expect(worstHealth(makeGroup({ hasDirty: true, hasBehindRemote: true }))).toBe('dirty');
+    expect(worstHealth(makeGroup({ hasBehindRemote: true, recommendedForCleanup: true }))).toBe('behind');
     expect(worstHealth(makeGroup({ hasMissing: true, recommendedForCleanup: true }))).toBe('missing');
     expect(worstHealth(makeGroup({ recommendedForCleanup: true }))).toBe('stale');
     expect(worstHealth(makeGroup({}))).toBe('clean');
@@ -46,5 +48,6 @@ describe('status vocabulary', () => {
   it('groupHealths lists all hit flags, severity-descending', () => {
     expect(groupHealths(makeGroup({}))).toEqual([]);
     expect(groupHealths(makeGroup({ hasDirty: true, recommendedForCleanup: true }))).toEqual(['dirty', 'stale']);
+    expect(groupHealths(makeGroup({ hasBehindRemote: true, hasUnmerged: true }))).toEqual(['unmerged', 'behind']);
   });
 });

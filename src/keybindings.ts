@@ -39,6 +39,8 @@ function dashboardBindings(config: AppConfig): Keybinding[] {
     { key: config.keybindings.dashboard.cleanupGroup, labelKey: 'keyCleanupGroup', role: 'primary' },
     { key: config.keybindings.dashboard.prune, labelKey: 'keyPrune', role: 'primary' },
     { key: config.keybindings.dashboard.repair, labelKey: 'keyRepair', role: 'primary' },
+    { key: config.keybindings.dashboard.fetch, labelKey: 'keyFetch', role: 'primary' },
+    { key: config.keybindings.dashboard.pull, labelKey: 'keyPull', role: 'primary' },
     { key: `${config.keybindings.dashboard.moveDown}/${config.keybindings.dashboard.moveUp}`, labelKey: 'keyMove', role: 'navigation' },
     { key: config.keybindings.dashboard.filter, labelKey: 'keyFilter', role: 'navigation' },
     { key: config.keybindings.dashboard.refresh, labelKey: 'keyRefresh', role: 'navigation' },
