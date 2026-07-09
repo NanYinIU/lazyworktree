@@ -1,0 +1,101 @@
+src/ui/status.ts
+  s_9f79d309c87394::t_c1af158b3f3ead 19
+  s_9f79d309c87394::t_a0b10c04dc4b11 6
+  s_9f79d309c87394::t_9891f2b1f6c856 28,39
+src/keybindings.ts
+  s_9f79d309c87394::t_461f604c9301eb 42-43
+src/workspace-root.ts
+  s_9f79d309c87394::t_50a91fae91a47f 1-66
+src/components/GroupList.tsx
+  s_9f79d309c87394::t_78e254e6f94346 181-182,185-196
+  s_9f79d309c87394::t_3a58cecf60632e 180,183-184
+  s_9f79d309c87394::t_91b0ab87f46321 16
+  s_9f79d309c87394::t_dcaf7d39b6d3b1 34
+  s_9f79d309c87394::t_318a2e331a1cd6 67
+  s_9f79d309c87394::t_3a7adbd07780cb 74
+  s_9f79d309c87394::t_3ce68735ffa413 40
+  s_9f79d309c87394::t_dcab6a14daf983 23
+  s_9f79d309c87394::t_dfb08c6459fa8e 24
+  s_9f79d309c87394::t_f13ae64a850878 76
+  s_9f79d309c87394::t_e63af2d54790a7 90
+  s_9f79d309c87394::t_bad546c290ee18 66
+  s_9f79d309c87394::t_6f07747514ab12 45
+src/git.ts
+  s_9f79d309c87394::t_58b289b395c8a3 218-232,238-243
+  s_9f79d309c87394::t_3e7e906b0d2b77 233-237
+  s_9f79d309c87394::t_5a765ee1f6620a 22,24
+  s_9f79d309c87394::t_84d9624e061dc7 217
+src/worktree-manager.ts
+  s_9f79d309c87394::t_eba4f25a47da0d 92
+  s_9f79d309c87394::t_cfb2df1f116e2c 111,122
+  s_9f79d309c87394::t_0bd85646a09097 80
+  s_9f79d309c87394::t_ef07d48d898d14 5
+src/view-models/group-dashboard-view.ts
+  s_9f79d309c87394::t_66f820eedbbb0d 6,14
+src/types.ts
+  s_9f79d309c87394::t_f8d45013cde472 86,98
+  s_9f79d309c87394::t_7ac7b927c19d11 150-163,165
+  s_9f79d309c87394::t_343c31eed224e4 164
+src/config.ts
+  s_9f79d309c87394::t_49ab277c54e94b 86-87
+  s_9f79d309c87394::t_26fc1819bd4d14 193-194
+  s_9f79d309c87394::t_2e81928a2e6772 28-29
+src/__tests__/worktree-manager.test.ts
+  s_9f79d309c87394::t_32c64a9dc6b445 135
+  s_9f79d309c87394::t_2bfb2962dba3a9 104,116
+src/components/ActivityComplete.tsx
+  s_9f79d309c87394::t_1812c5ec8391e5 107-126
+  s_9f79d309c87394::t_0480c929f24899 37
+  s_9f79d309c87394::t_8846dcbe61f6db 3,7,15-16
+src/i18n.ts
+  s_9f79d309c87394::t_1274c045820a31 114,117
+  s_9f79d309c87394::t_6a7f12a7135f6a 176-193
+  s_9f79d309c87394::t_5d670c115642dc 239-240
+  s_9f79d309c87394::t_043eed7b28cff5 107,280,283-289
+src/__tests__/workspace-root.test.ts
+  s_9f79d309c87394::t_2aa2256c9b7fc6 1-65,68,70-84,86-99
+  s_9f79d309c87394::t_0238131adcf276 66-67,69
+  s_9f79d309c87394::t_d80e1f97d09942 85
+src/manage-executor.ts
+  s_9f79d309c87394::t_4ca3972c02964b 373-375,381-396,398-399,401-402,406
+  s_9f79d309c87394::t_137d8a8bbda4bd 3,12
+  s_9f79d309c87394::t_bd7af0b1226e3a 11
+  s_9f79d309c87394::t_9786274bc55096 372,376-380,397,400,403-405,407-458
+src/__tests__/status.test.ts
+  s_9f79d309c87394::t_793df1283240b6 39,41-42,51
+  s_9f79d309c87394::t_92aff6f8b1fd86 14
+src/__tests__/group-dashboard-view.test.ts
+  s_9f79d309c87394::t_589d57f75c8247 45
+  s_9f79d309c87394::t_797ade0634360d 14
+  s_9f79d309c87394::t_d8e4f97f711d50 25,29
+src/App.tsx
+  s_9f79d309c87394::t_50ec42e8449780 355,357,359-363,365-380
+  s_9f79d309c87394::t_c79b6275d3bf19 24
+  s_9f79d309c87394::t_78457ef98049cb 452-453
+  s_9f79d309c87394::t_1a6926d5acfb29 469
+  s_9f79d309c87394::t_958b19d934c78b 130-131
+  s_9f79d309c87394::t_1e42219b3aa645 137
+  s_9f79d309c87394::t_6c5748bddbf2c5 174-175
+  s_9f79d309c87394::t_fa3684353e42d4 16-17
+  s_9f79d309c87394::t_ce606ad363f570 20
+  s_9f79d309c87394::t_93533d0c4afd5a 476-477
+  s_9f79d309c87394::t_a48d726bdae77b 352-354,356,358,364
+package.json
+  s_9f79d309c87394::t_ece441283a41ff 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "ed7883a71435c4c7e8c0ede8e8f0768b2b7a77e7",
+  "prompts": {},
+  "sessions": {
+    "s_9f79d309c87394": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "4fedf4a4-bd50-4410-9107-08a0e6223169",
+        "model": "custom:DSV4-Flash-0"
+      },
+      "human_author": "高国兴 <nanyin@uxin.com>"
+    }
+  }
+}
